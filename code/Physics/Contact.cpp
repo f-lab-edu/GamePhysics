@@ -12,8 +12,18 @@ void ResolveContact( contact_t & contact ) {
 	Body* bodyA = contact.bodyA;
 	Body* bodyB = contact.bodyB;
 
-	bodyA->m_linearVelocity.Zero();
-	bodyB->m_linearVelocity.Zero();
+	const float invMassA = bodyA->m_invMass;
+	const float invMassB = bodyB->m_invMass;
+	
+	// calculate the collision impulse
+	const Vec3& normalizedVector = contact.normal;
+	const Vec3& velocityAminusB = bodyA->m_linearVelocity - bodyB->m_linearVelocity;
+	const float impulseJ = -2.0f * velocityAminusB.Dot(normalizedVector) / (invMassA + invMassB);
+	const Vec3 vectorImpulseJ = normalizedVector * impulseJ;
+
+	bodyA->ApplyImpulseLinear(vectorImpulseJ * 1.0f);
+	bodyB->ApplyImpulseLinear(vectorImpulseJ * -1.0f);
+
 
 	// let's also move our colliding objects to just outside of each other
 	const float proportionOfA = bodyA->m_invMass / (bodyA->m_invMass + bodyB->m_invMass);
