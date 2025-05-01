@@ -79,6 +79,23 @@ void Scene::Update( const float deltaSecond ) {
 		currentBody->ApplyImpulseLinear(impulseGravity);
 	}
 
+	// check for collisions with other bodies
 	for (int currentBodyIndex = 0; currentBodyIndex < m_bodies.size(); ++currentBodyIndex) {
+		for (int currentBodyIndexNested = 0; currentBodyIndexNested < m_bodies.size(); ++currentBodyIndexNested) {
+			Body* bodyA = &m_bodies[currentBodyIndex];
+			Body* bodyB = &m_bodies[currentBodyIndexNested];
+		
+			// skip body pairs with infinite mass
+			if (0.0f == bodyA->m_invMass && 0.0f == bodyB->m_invMass)
+				continue;
+
+			contact_t contact;
+			if (Intersect(bodyA, bodyB, contact))
+				ResolveContact(contact);
+		}
+	}
+
+
+	for (int currentBodyIndex = 0; currentBodyIndex < m_bodies.size(); ++currentBodyIndex) 
 		m_bodies[currentBodyIndex].m_position += m_bodies[currentBodyIndex].m_linearVelocity * deltaSecond;
 }
