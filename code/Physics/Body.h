@@ -33,5 +33,8 @@ public:
 	Vec3 WorldSpaceToBodySpace(const Vec3& pt) const;
 	Vec3 BodySpaceToWorldSpace(const Vec3& pt) const;
 
+	Mat3 GetInverseInertiaTensorBodySpace() const;
+	Mat3 GetInverseInertiaTensorWorldSpace() const;
+
 	void ApplyImpulseLinear(const Vec3& impluse);
 };
