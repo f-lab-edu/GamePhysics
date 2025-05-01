@@ -65,6 +65,15 @@ void Scene::Initialize() {
 Scene::Update
 ====================================================
 */
-void Scene::Update( const float dt_sec ) {
-	// TODO: Add code
+void Scene::Update( const float deltaSecond ) {
+	for (int currentBodyIndex = 0; currentBodyIndex < m_bodies.size(); ++currentBodyIndex) {
+		Body* currentBody = &m_bodies[currentBodyIndex];
+
+		float mass = 1.0f / currentBody->m_invMass;
+		Vec3 impulseGravity = Vec3(0, 0, -10) * mass * deltaSecond;
+		currentBody->ApplyImpulseLinear(impulseGravity);
+	}
+
+	for (int currentBodyIndex = 0; currentBodyIndex < m_bodies.size(); ++currentBodyIndex) {
+		m_bodies[currentBodyIndex].m_position += m_bodies[currentBodyIndex].m_linearVelocity * deltaSecond;
 }
