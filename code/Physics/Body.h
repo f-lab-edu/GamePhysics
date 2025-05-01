@@ -23,6 +23,7 @@ public:
 	Vec3		m_position;
 	Quat		m_orientation;
 	Vec3		m_linearVelocity;
+	Vec3		m_angularVelocity;
 
 	float		m_invMass;
 	float		m_elasticity;
