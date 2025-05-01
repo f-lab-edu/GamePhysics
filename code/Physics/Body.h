@@ -41,5 +41,5 @@ public:
 	void ApplyImpulseLinear(const Vec3& linearImpulse);
 	void ApplyImpulseAngular(const Vec3& angularImpulse);
 
-	void Update(const float deltaTime);
+	void Update(const float deltaSecond);
 };
