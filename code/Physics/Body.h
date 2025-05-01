@@ -40,4 +40,6 @@ public:
 	void ApplyImpulse(const Vec3& impulsePoint, const Vec3& linearImpulse);
 	void ApplyImpulseLinear(const Vec3& linearImpulse);
 	void ApplyImpulseAngular(const Vec3& angularImpulse);
+
+	void Update(const float deltaTime);
 };
