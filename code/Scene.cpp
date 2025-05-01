@@ -93,6 +93,6 @@ void Scene::Update( const float deltaSecond ) {
 		}
 	}
 
-	for (int currentBodyIndex = 0; currentBodyIndex < m_bodies.size(); ++currentBodyIndex) 
-		m_bodies[currentBodyIndex].m_position += m_bodies[currentBodyIndex].m_linearVelocity * deltaSecond;
+	for (int currentBodyIndex = 0; currentBodyIndex < m_bodies.size(); ++currentBodyIndex)
+		m_bodies[currentBodyIndex].Update(deltaSecond);
 }
