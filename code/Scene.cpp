@@ -77,7 +77,7 @@ void Scene::Update( const float deltaSecond ) {
 
 	// check for collisions with other bodies
 	for (int currentBodyIndex = 0; currentBodyIndex < m_bodies.size(); ++currentBodyIndex) {
-		for (int currentBodyIndexNested = 0; currentBodyIndexNested < m_bodies.size(); ++currentBodyIndexNested) {
+		for (int currentBodyIndexNested = currentBodyIndex + 1; currentBodyIndexNested < m_bodies.size(); ++currentBodyIndexNested) {
 			Body* bodyA = &m_bodies[currentBodyIndex];
 			Body* bodyB = &m_bodies[currentBodyIndexNested];
 		
@@ -90,7 +90,6 @@ void Scene::Update( const float deltaSecond ) {
 				ResolveContact(contact);
 		}
 	}
-
 
 	for (int currentBodyIndex = 0; currentBodyIndex < m_bodies.size(); ++currentBodyIndex) 
 		m_bodies[currentBodyIndex].m_position += m_bodies[currentBodyIndex].m_linearVelocity * deltaSecond;
