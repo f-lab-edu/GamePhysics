@@ -49,7 +49,17 @@ Mat3 Body::GetInverseInertiaTensorWorldSpace() const {
 	return invInertiaTensor;
 }
 
+void Body::ApplyImpulse(const Vec3& impulsePoint, const Vec3& linearImpulse) {
+	if (0.0f == m_invMass)
+		return;
 
+	ApplyImpulseLinear(linearImpulse);
+
+	Vec3 pivotPoint = GetCenterOfMassWorldSpace();
+	Vec3 positionVector = impulsePoint - pivotPoint;
+	Vec3 angularImpulse = positionVector.Cross(linearImpulse);
+	ApplyImpulseAngular(angularImpulse);
+}
 void Body::ApplyImpulseLinear(const Vec3& linearImpulse) {
 	if (0.0f == m_invMass)
 		return;
