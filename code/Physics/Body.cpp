@@ -9,8 +9,8 @@ Body::Body
 ====================================================
 */
 Body::Body() :
-	m_position( 0.0f ),
-	m_orientation( 0.0f, 0.0f, 0.0f, 1.0f ),
+	m_position(0.0f),
+	m_orientation(0.0f, 0.0f, 0.0f, 1.0f),
 	m_linearVelocity(0.0f),
 	m_shape( NULL ) {
 }
@@ -40,4 +40,18 @@ void Body::ApplyImpulseLinear(const Vec3& impulse) {
 		return;
 
 	m_linearVelocity += impulse * m_invMass;
+}
+
+
+Mat3 Body::GetInverseInertiaTensorBodySpace() const {
+	Mat3 inertiaTensor = m_shape->InertiaTensor();
+	Mat3 invInertiaTensor = inertiaTensor.Inverse() * m_invMass;
+	return invInertiaTensor;
+}
+Mat3 Body::GetInverseInertiaTensorWorldSpace() const {
+	Mat3 inertiaTensor = m_shape->InertiaTensor();
+	Mat3 invInertiaTensor = inertiaTensor.Inverse() * m_invMass;
+	Mat3 orient = m_orientation.ToMat3();
+	invInertiaTensor = orient * invInertiaTensor * orient.Transpose();
+	return invInertiaTensor;
 }
