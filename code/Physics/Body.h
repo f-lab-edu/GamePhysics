@@ -37,4 +37,5 @@ public:
 	Mat3 GetInverseInertiaTensorWorldSpace() const;
 
 	void ApplyImpulseLinear(const Vec3& impluse);
+	void ApplyImpulseAngular(const Vec3& impluse);
 };
