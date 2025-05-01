@@ -31,5 +31,5 @@ public:
 	Vec3 WorldSpaceToBodySpace(const Vec3& pt) const;
 	Vec3 BodySpaceToWorldSpace(const Vec3& pt) const;
 
-	void ApplyImpulseLinear(const Vec3& impluse);
+	void ApplyImpulseLinear(const Vec3& impulse);
 };
