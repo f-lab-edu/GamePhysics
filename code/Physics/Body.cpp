@@ -50,18 +50,18 @@ Mat3 Body::GetInverseInertiaTensorWorldSpace() const {
 }
 
 
-void Body::ApplyImpulseLinear(const Vec3& impulse) {
+void Body::ApplyImpulseLinear(const Vec3& linearImpulse) {
 	if (0.0f == m_invMass)
 		return;
 
-	m_linearVelocity += impulse * m_invMass;
+	m_linearVelocity += linearImpulse * m_invMass;
 }
 
-void Body::ApplyImpulseAngular(const Vec3& impulse) {
+void Body::ApplyImpulseAngular(const Vec3& angularImpulse) {
 	if (0.0f == m_invMass)
 		return;
 
-	m_angularVelocity += GetInverseInertiaTensorWorldSpace() * impulse;
+	m_angularVelocity += GetInverseInertiaTensorWorldSpace() * angularImpulse;
 
 	// if the angular velocity is too high, modify it to the arbitrary limit
 	const float maxAngularSpeed = 30.0f;
