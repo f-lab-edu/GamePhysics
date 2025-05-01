@@ -23,10 +23,10 @@ void ResolveContact( contact_t & contact ) {
 	const Vec3& normalizedVector = contact.normal;
 	const Vec3& velocityAminusB = bodyA->m_linearVelocity - bodyB->m_linearVelocity;
 	const float impulseJ = -(1.0f + elasticity) * velocityAminusB.Dot(normalizedVector) / (invMassA + invMassB);
-	const Vec3 vectorImpulseJ = normalizedVector * impulseJ;
+	const Vec3 impulseVector = normalizedVector * impulseJ;
 
-	bodyA->ApplyImpulseLinear(vectorImpulseJ * 1.0f);
-	bodyB->ApplyImpulseLinear(vectorImpulseJ * -1.0f);
+	bodyA->ApplyImpulseLinear(impulseVector * 1.0f);
+	bodyB->ApplyImpulseLinear(impulseVector * -1.0f);
 
 
 	// let's also move our colliding objects to just outside of each other
