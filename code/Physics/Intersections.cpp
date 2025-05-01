@@ -21,7 +21,7 @@ bool Intersect( Body *bodyA, Body *bodyB, contact_t &contact ) {
 	const ShapeSphere* sphereB = (const ShapeSphere*)bodyB->m_shape;
 
 	contact.ptOnA_WorldSpace = bodyA->m_position + contact.normal * sphereA->m_radius;
-	contact.ptOnB_WorldSpace = bodyB->m_position + contact.normal * sphereB->m_radius;
+	contact.ptOnB_WorldSpace = bodyB->m_position - contact.normal * sphereB->m_radius;
 
 	const float radiusAB = sphereA->m_radius + sphereB->m_radius;
 	const float lengthSquared = vectorAB.GetLengthSqr();
