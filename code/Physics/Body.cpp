@@ -49,6 +49,7 @@ Mat3 Body::GetInverseInertiaTensorWorldSpace() const {
 	return invInertiaTensor;
 }
 
+
 void Body::ApplyImpulse(const Vec3& impulsePoint, const Vec3& linearImpulse) {
 	if (0.0f == m_invMass)
 		return;
@@ -66,7 +67,6 @@ void Body::ApplyImpulseLinear(const Vec3& linearImpulse) {
 
 	m_linearVelocity += linearImpulse * m_invMass;
 }
-
 void Body::ApplyImpulseAngular(const Vec3& angularImpulse) {
 	if (0.0f == m_invMass)
 		return;
@@ -79,4 +79,32 @@ void Body::ApplyImpulseAngular(const Vec3& angularImpulse) {
 		m_angularVelocity.Normalize();
 		m_angularVelocity *= maxAngularSpeed;
 	}
+}
+
+
+void Body::Update(const float deltaSecond) {
+    m_position += m_linearVelocity * deltaSecond;
+
+    Vec3 centerOfMass = GetCenterOfMassWorldSpace();
+    Vec3 comToPos = m_position - centerOfMass;
+
+    Mat3 orientation = m_orientation.ToMat3();
+    // Transform the inertia tensor from body space to world space
+    Mat3 inertiaTensor = orientation * m_shape->InertiaTensor() * orientation.Transpose();
+    // Compute the angular acceleration
+    Vec3 acceleration = inertiaTensor.Inverse() * (m_angularVelocity.Cross(inertiaTensor * m_angularVelocity));
+    m_angularVelocity += acceleration * deltaSecond; // angular acceleration times delta time = delta angular velocity
+
+
+    // Update orientation
+    // This vector's direction is the axis of rotation, and its magnitude is the angle (in radians)
+    Vec3 deltaAngle = m_angularVelocity * deltaSecond;
+    Quat deltaQuat = Quat(deltaAngle, deltaAngle.GetMagnitude());
+    m_orientation = deltaQuat * m_orientation;
+    // Normalize the quaternion to prevent numerical drift (quaternions must have magnitude 1)
+    m_orientation.Normalize();
+
+    // Update the reference position by rotating the offset vector around the center of mass
+    // This ensures the position follows the body's rotation although m_position isn’t the center of mass
+    m_position = centerOfMass + deltaQuat.RotatePoint(comToPos);
 }
