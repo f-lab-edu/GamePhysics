@@ -47,18 +47,22 @@ Scene::Initialize
 */
 void Scene::Initialize() {
 	Body body;
-	body.m_position = Vec3(0, 0, 10);
+	body.m_position = Vec3(0, 0, 1);
 	body.m_orientation = Quat(0, 0, 0, 1);
+	body.m_linearVelocity = Vec3(1, 0, 0);
 	body.m_invMass = 1.0f;
-	body.m_elasticity = 0.5f;
+	body.m_elasticity = 0.0f;
+	body.m_friction = 0.5f;
 	body.m_shape = new ShapeSphere(1.0f);
 	m_bodies.push_back(body);
 
 	// Add a ground sphere that won't fall under the influence of gravity
 	body.m_position = Vec3(0, 0, -1000);
 	body.m_orientation = Quat(0, 0, 0, 1);
+	body.m_linearVelocity = Vec3(0, 0, 0);
 	body.m_invMass = 0.0f;
 	body.m_elasticity = 1.0f;
+	body.m_friction = 0.5f;
 	body.m_shape = new ShapeSphere(1000.0f);
 	m_bodies.push_back(body);
 }
