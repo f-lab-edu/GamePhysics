@@ -8,7 +8,7 @@
 ResolveContact
 ====================================================
 */
-void ResolveContact( contact_t & contact ) {
+void ResolveContact(contact_t& contact) {
 	Body* bodyA = contact.bodyA;
 	Body* bodyB = contact.bodyB;
 
@@ -27,6 +27,8 @@ void ResolveContact( contact_t & contact ) {
 
 	const Vec3 normalizedVector = contact.normal;
 
+	// ------
+	// calculate collision impulse
 	const Vec3 comToPointA = pointOnA - bodyA->GetCenterOfMassWorldSpace();
 	const Vec3 comToPointB = pointOnB - bodyB->GetCenterOfMassWorldSpace();
 
@@ -44,9 +46,14 @@ void ResolveContact( contact_t & contact ) {
 	const Vec3 totalCollisionImpulseVector = normalizedVector * totalCollisionImpulseScalar;
 	bodyA->ApplyImpulse(pointOnA, totalCollisionImpulseVector * -1.0f);
 	bodyB->ApplyImpulse(pointOnB, totalCollisionImpulseVector * 1.0f);
+	// ------
 
 
-
+	// ------
+	// calculate friction impulse
+	const float frictionA = bodyA->m_friction;
+	const float frictionB = bodyB->m_friction;
+	const float friction = frictionA * frictionB;
 	// The adjustedRelativeVelocity is a vector with the direction of normalizedVector 
 	// but with a magnitude equal to the projection of totalRelativeVelocity onto normalizedVector.
 	const Vec3 adjustedRelativeVelocity = normalizedVector * normalizedVector.Dot(totalRelativeVelocity);
@@ -57,15 +64,16 @@ void ResolveContact( contact_t & contact ) {
 	Vec3 unitTangentialVector = tagentialVector;
 	unitTangentialVector.Normalize();
 
-	const Vec3 inertiaA = (invWorldInertiaA * ra.Cross(unitTangentialVector)).Cross(ra);
-	const Vec3 inertiaB = (invWorldInertiaB * rb.Cross(unitTangentialVector)).Cross(rb);
-	const float invInertia = (inertiaA + inertiaB ).Dot(unitTangentialVector);
+	const Vec3 inertiaA = (invWorldInertiaA * comToPointA.Cross(unitTangentialVector)).Cross(comToPointA);
+	const Vec3 inertiaB = (invWorldInertiaB * comToPointB.Cross(unitTangentialVector)).Cross(comToPointB);
+	const float invInertia = (inertiaA + inertiaB).Dot(unitTangentialVector);
 	// calculate the tangential impulse for friction
 	const float reducedMass = 1.0f / (bodyA->m_invMass + bodyB->m_invMass + invInertia);
-	const Vec3 impulseFriction = tagentialVector * reducedMass * friction ;
+	const Vec3 impulseFriction = tagentialVector * reducedMass * friction;
 	// apply kinetic friction impulses
-	bodyA->ApplyImpulse(ptOnA, impulseFriction * -1.0f);
-	bodyB->ApplyImpulse(ptOnB, impulseFriction * 1.0f);
+	bodyA->ApplyImpulse(pointOnA, impulseFriction * -1.0f);
+	bodyB->ApplyImpulse(pointOnB, impulseFriction * 1.0f);
+	// ------
 
 
 
