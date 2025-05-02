@@ -40,10 +40,10 @@ void ResolveContact( contact_t & contact ) {
 
 	// apply collision impulses
 	const Vec3 totalRelativeVelocity = totalVelocityA - totalVelocityB;
-	const float totalImpulseScalar = (1.0f + elasticity) * totalRelativeVelocity.Dot(normalizedVector) / (invMassA + invMassB + angularFactor);
-	const Vec3 totalImpulseVector = normalizedVector * totalImpulseScalar;
-	bodyA->ApplyImpulse(pointOnA, totalImpulseVector * -1.0f);
-	bodyB->ApplyImpulse(pointOnB, totalImpulseVector * 1.0f);
+	const float totalCollisionImpulseScalar = (1.0f + elasticity) * totalRelativeVelocity.Dot(normalizedVector) / (invMassA + invMassB + angularFactor);
+	const Vec3 totalCollisionImpulseVector = normalizedVector * totalCollisionImpulseScalar;
+	bodyA->ApplyImpulse(pointOnA, totalCollisionImpulseVector * -1.0f);
+	bodyB->ApplyImpulse(pointOnB, totalCollisionImpulseVector * 1.0f);
 
 
 
