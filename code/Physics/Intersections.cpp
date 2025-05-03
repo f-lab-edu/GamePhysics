@@ -73,8 +73,8 @@ bool SphereSphereDynamic(const ShapeSphere* shapeA, const ShapeSphere* shapeB, c
 	if (timeOfImpact > deltaTime)
 		return false;
 	
-	// at this point, timeOfImpact can be negative or positive
-	// if it's negative, then it means that the two spheres are currently intersecting
+	// at this point, timeOfImpact can be zero or positive
+	// if it's zero, then it means that the two spheres are currently intersecting
 	// otherwise, they will collide soon
 	
 	// get the points on the respective points of collision and return true
