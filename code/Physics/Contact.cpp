@@ -1,3 +1,13 @@
+//
+//  Contact.cpp
+//
+#include "Contact.h"
+
+/*
+====================================================
+ResolveContact
+====================================================
+*/
 void ResolveContact(contact_t& contact) {
 	Body* bodyA = contact.bodyA;
 	Body* bodyB = contact.bodyB;
@@ -74,4 +84,16 @@ void ResolveContact(contact_t& contact) {
 	const Vec3 vectorBtwTwoContactPoints = contact.ptOnB_WorldSpace - contact.ptOnA_WorldSpace;
 	bodyA->m_position += vectorBtwTwoContactPoints * proportionOfA;
 	bodyB->m_position -= vectorBtwTwoContactPoints * proportionOfB;
+}
+
+int CompareContacts(const void* contactA, const void* contactB) {
+	contact_t a = *reinterpret_cast<const contact_t*>(contactA);
+	contact_t b = *reinterpret_cast<const contact_t*>(contactB);
+
+	if (a.timeOfImpact < b.timeOfImpact)
+		return -1;
+	else if (a.timeOfImpact == b.timeOfImpact)
+		return 0;
+	else
+		return 1;
 }
