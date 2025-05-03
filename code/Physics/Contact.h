@@ -20,3 +20,4 @@ struct contact_t {
 };
 
 void ResolveContact( contact_t & contact );
+int CompareContacts(const void* contactA, const void* contactB);
