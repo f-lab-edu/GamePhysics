@@ -18,4 +18,10 @@ struct collisionPair_t {
 	}
 };
 
+struct psuedoBody_t {
+	int id;
+	float value;
+	bool isMin;
+};
+
 void BroadPhase( const Body * bodies, const int num, std::vector< collisionPair_t > & finalPairs, const float dt_sec );
