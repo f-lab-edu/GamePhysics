@@ -12,8 +12,8 @@ void ResolveContact(contact_t& contact) {
 	Body* bodyA = contact.bodyA;
 	Body* bodyB = contact.bodyB;
 
-	const Vec3 pointOnA = contact.ptOnA_WorldSpace;
-	const Vec3 pointOnB = contact.ptOnB_WorldSpace;
+	const Vec3 pointOnA = bodyA->BodySpaceToWorldSpace(contact.ptOnA_LocalSpace);
+	const Vec3 pointOnB = bodyB->BodySpaceToWorldSpace(contact.ptOnB_LocalSpace);
 
 	const float elasticityA = bodyA->m_elasticity;
 	const float elasticityB = bodyB->m_elasticity;
@@ -83,7 +83,7 @@ void ResolveContact(contact_t& contact) {
 		const float proportionOfA = invMassA / (invMassA + invMassB);
 		const float proportionOfB = invMassB / (invMassA + invMassB);
 
-		const Vec3 vectorBtwTwoContactPoints = contact.ptOnB_WorldSpace - contact.ptOnA_WorldSpace;
+		const Vec3 vectorBtwTwoContactPoints = pointOnB - pointOnA;
 		bodyA->m_position += vectorBtwTwoContactPoints * proportionOfA;
 		bodyB->m_position -= vectorBtwTwoContactPoints * proportionOfB;
 	}
