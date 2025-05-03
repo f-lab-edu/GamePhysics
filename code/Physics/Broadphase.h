@@ -26,6 +26,6 @@ struct psuedoBody_t {
 
 int CompareSAP(const void* lhs, const void* rhs);
 void SortBodiesBounds(const Body* bodies, const int numBodies, psuedoBody_t* sortedArray, const float deltaSecond);
-void BulidPairs(std::vector<collisionPair_t>& collisionPairs, const psuedoBody_t* sortedBodies, const int numBodies);
+void BuildPairs(std::vector<collisionPair_t>& collisionPairs, const psuedoBody_t* sortedBodies, const int numBodies);
 void SweepAndPrune1D(const Body* bodies, const int numBodies, std::vector<collisionPair_t>& finalPairs, const float deltaSecond);
 void BroadPhase( const Body * bodies, const int numBodies, std::vector< collisionPair_t > & finalPairs, const float deltaSecond);
