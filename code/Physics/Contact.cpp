@@ -28,7 +28,7 @@ void ResolveContact(contact_t& contact) {
 	const Vec3 normalizedVector = contact.normal;
 
 	// ------
-	// calculate collision impulse
+	// calculate the impulse caused by collision
 	const Vec3 comToPointA = pointOnA - bodyA->GetCenterOfMassWorldSpace();
 	const Vec3 comToPointB = pointOnB - bodyB->GetCenterOfMassWorldSpace();
 
@@ -50,7 +50,7 @@ void ResolveContact(contact_t& contact) {
 
 
 	// ------
-	// calculate friction impulse
+	// calculate the impulse caused by friction
 	const float frictionA = bodyA->m_friction;
 	const float frictionB = bodyB->m_friction;
 	const float friction = frictionA * frictionB;
@@ -78,12 +78,15 @@ void ResolveContact(contact_t& contact) {
 
 
 	// let's also move our colliding objects to just outside of each other
-	const float proportionOfA = invMassA / (invMassA + invMassB);
-	const float proportionOfB = invMassB / (invMassA + invMassB);
+	// toi is zero only if the objects are intersecting
+	if (0.0f == contact.timeOfImpact) {
+		const float proportionOfA = invMassA / (invMassA + invMassB);
+		const float proportionOfB = invMassB / (invMassA + invMassB);
 
-	const Vec3 vectorBtwTwoContactPoints = contact.ptOnB_WorldSpace - contact.ptOnA_WorldSpace;
-	bodyA->m_position += vectorBtwTwoContactPoints * proportionOfA;
-	bodyB->m_position -= vectorBtwTwoContactPoints * proportionOfB;
+		const Vec3 vectorBtwTwoContactPoints = contact.ptOnB_WorldSpace - contact.ptOnA_WorldSpace;
+		bodyA->m_position += vectorBtwTwoContactPoints * proportionOfA;
+		bodyB->m_position -= vectorBtwTwoContactPoints * proportionOfB;
+	}
 }
 
 int CompareContacts(const void* contactA, const void* contactB) {
