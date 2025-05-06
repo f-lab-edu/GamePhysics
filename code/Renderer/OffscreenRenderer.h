@@ -2,6 +2,7 @@
 //  OffscreenRenderer.h
 //
 #pragma once
+#include <vulkan/vulkan.h>
 
 class DeviceContext;
 class Buffer;
