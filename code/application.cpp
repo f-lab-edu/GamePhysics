@@ -437,6 +437,12 @@ void Application::Keyboard( int key, int scancode, int action, int modifiers ) {
 	if ( GLFW_KEY_Y == key && ( GLFW_PRESS == action || GLFW_REPEAT == action ) ) {
 		m_stepFrame = m_isPaused && !m_stepFrame;
 	}
+
+	if (GLFW_KEY_V == key && GLFW_RELEASE == action) {
+		for (auto& model : m_renderModels) {
+			model.isDebug = !model.isDebug; // Toggle debug flag
+		}
+	}
 }
 
 /*
