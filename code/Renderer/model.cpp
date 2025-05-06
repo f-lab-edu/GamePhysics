@@ -498,9 +498,10 @@ bool Model::MakeVBO( DeviceContext * device ) {
 	VkCommandBuffer vkCommandBuffer = device->m_vkCommandBuffers[ 0 ];
 
 	int bufferSize;
+	const int debuggingLinesCount = 6;
 
 	// Create Vertex Buffer
-	bufferSize = (int)( sizeof( m_vertices[ 0 ] ) * m_vertices.size());
+	bufferSize = (int)( sizeof( m_vertices[ 0 ] ) * m_vertices.size() + debuggingLinesCount);
 	if ( !m_vertexBuffer.Allocate( device, m_vertices.data(), bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT ) ) {
 		printf( "failed to allocate vertex buffer!\n" );
 		assert( 0 );
@@ -508,7 +509,7 @@ bool Model::MakeVBO( DeviceContext * device ) {
 	}
 
 	// Create Index Buffer
-	bufferSize = (int)( sizeof( m_indices[ 0 ] ) * m_indices.size() );
+	bufferSize = (int)( sizeof( m_indices[ 0 ] ) * m_indices.size() + debuggingLinesCount);
 	if ( !m_indexBuffer.Allocate( device, m_indices.data(), bufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT ) ) {
 		printf( "failed to allocate index buffer!\n" );
 		assert( 0 );
@@ -531,6 +532,24 @@ void Model::Cleanup( DeviceContext & deviceContext ) {
 
 	m_vertexBuffer.Cleanup( &deviceContext );
 	m_indexBuffer.Cleanup( &deviceContext );
+}
+
+/*
+====================================================
+Model::ResetDebugBuffers
+====================================================
+*/
+void Model::ResetDebugBuffers(DeviceContext* device) {
+	VkDeviceSize debugVertexSize = sizeof(vert_t) * 6;
+	void* data;
+	vkMapMemory(device->m_vkDevice, m_vertexBuffer.m_vkBufferMemory, sizeof(vert_t) * m_vertices.size(), debugVertexSize, 0, &data);
+	memset(data, 0, debugVertexSize);
+	vkUnmapMemory(device->m_vkDevice, m_vertexBuffer.m_vkBufferMemory);
+
+	VkDeviceSize debugIndexSize = sizeof(unsigned int) * 6;
+	vkMapMemory(device->m_vkDevice, m_indexBuffer.m_vkBufferMemory, sizeof(unsigned int) * m_indices.size(), debugIndexSize, 0, &data);
+	memset(data, 0, debugIndexSize);
+	vkUnmapMemory(device->m_vkDevice, m_indexBuffer.m_vkBufferMemory);
 }
 
 /*
