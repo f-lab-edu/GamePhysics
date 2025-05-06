@@ -208,12 +208,81 @@ bool CleanupOffscreen( DeviceContext * device ) {
 	return true;
 }
 
+
+/*
+====================================================
+DrawDebugAxes
+====================================================
+*/
+void DrawDebugAxes(VkCommandBuffer cmdBuffer, DeviceContext* device, const RenderModel& model, Buffer* uniforms) {
+	// Define axis lines (X: red, Y: green, Z: blue) with 100-unit length for visibility
+	std::vector<vert_t> debugVertices = {
+		// X-axis (red)
+		{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {0, 0, 0, 0}, {0, 0, 0, 0}, {255, 0, 0, 255}},
+		{{7.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {0, 0, 0, 0}, {0, 0, 0, 0}, {255, 0, 0, 255}},
+		// Y-axis (green)
+		{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 255, 0, 255}},
+		{{0.0f, 7.0f, 0.0f}, {0.0f, 0.0f}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 255, 0, 255}},
+		// Z-axis (blue)
+		{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 255, 255}},
+		{{0.0f, 0.0f, 7.0f}, {0.0f, 0.0f}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 255, 255}}
+	};
+	// Define indices for lines
+	std::vector<unsigned int> debugIndices = { 0, 1, 2, 3, 4, 5 };
+
+	// Append to model's vertex buffer
+	VkDeviceSize debugVertexSize = sizeof(vert_t) * debugVertices.size();
+	VkDeviceSize vertexOffset = sizeof(double) * model.model->m_vertices.size();
+
+	void* data;
+	vkMapMemory(device->m_vkDevice, model.model->m_vertexBuffer.m_vkBufferMemory, vertexOffset, debugVertexSize, 0, &data);
+	memcpy(data, debugVertices.data(), debugVertexSize);
+	vkUnmapMemory(device->m_vkDevice, model.model->m_vertexBuffer.m_vkBufferMemory);
+
+	// Append to model's index buffer
+	VkDeviceSize debugIndexSize = sizeof(unsigned int) * debugIndices.size();
+	VkDeviceSize indexOffset = sizeof(unsigned int) * model.model->m_indices.size();
+
+	vkMapMemory(device->m_vkDevice, model.model->m_indexBuffer.m_vkBufferMemory, indexOffset, debugIndexSize, 0, &data);
+	memcpy(data, debugIndices.data(), debugIndexSize);
+	vkUnmapMemory(device->m_vkDevice, model.model->m_indexBuffer.m_vkBufferMemory);
+
+	// Bind pipeline
+	
+	extern Pipeline g_checkerboardShadowPipeline;
+	g_checkerboardShadowPipeline.BindPipeline(cmdBuffer);
+
+	// Bind vertex and index buffers
+	VkBuffer vertexBuffers[] = { model.model->m_vertexBuffer.m_vkBuffer };
+	VkDeviceSize offsets[] = { vertexOffset };
+	vkCmdBindVertexBuffers(cmdBuffer, 0, 1, vertexBuffers, offsets);
+	vkCmdBindIndexBuffer(cmdBuffer, model.model->m_indexBuffer.m_vkBuffer, indexOffset, VK_INDEX_TYPE_UINT32);
+
+	// Bind descriptor
+	Descriptor descriptor = g_checkerboardShadowPipeline.GetFreeDescriptor();
+	const int camOffset = 0;
+	const int camSize = sizeof(float) * 16 * 4;
+	const int shadowCamOffset = device->GetAligendUniformByteOffset(camOffset + camSize);
+	const int shadowCamSize = camSize;
+	descriptor.BindBuffer(uniforms, camOffset, camSize, 0);
+	descriptor.BindBuffer(uniforms, model.uboByteOffset, model.uboByteSize, 1);
+	descriptor.BindBuffer(uniforms, shadowCamOffset, shadowCamSize, 2);
+	extern FrameBuffer g_shadowFrameBuffer;
+	descriptor.BindImage(VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		g_shadowFrameBuffer.m_imageDepth.m_vkImageView,
+		Samplers::m_samplerStandard, 0);
+	descriptor.BindDescriptor(device, cmdBuffer, &g_checkerboardShadowPipeline);
+
+	// Draw indexed
+	vkCmdDrawIndexed(cmdBuffer, debugIndices.size(), 1, 0, 0, 0);
+}
+
 /*
 ====================================================
 DrawOffscreen
 ====================================================
 */
-void DrawOffscreen( DeviceContext * device, int cmdBufferIndex, Buffer * uniforms, const RenderModel * renderModels, const int numModels ) {
+void DrawOffscreen( DeviceContext * device, int cmdBufferIndex, Buffer * uniforms, const RenderModel * renderModels, const int numModels, bool isDebug) {
 	VkCommandBuffer cmdBuffer = device->m_vkCommandBuffers[ cmdBufferIndex ];
 
 	const int camOffset = 0;
@@ -287,6 +356,11 @@ void DrawOffscreen( DeviceContext * device, int cmdBufferIndex, Buffer * uniform
 				descriptor.BindImage( VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, g_shadowFrameBuffer.m_imageDepth.m_vkImageView, Samplers::m_samplerStandard, 0 );
 				descriptor.BindDescriptor( device, cmdBuffer, &g_checkerboardShadowPipeline );
 				renderModel.model->DrawIndexed( cmdBuffer );
+
+				// Debug drawing
+				if (isDebug) {
+					DrawDebugAxes(cmdBuffer, device, renderModel, uniforms);
+				}
 			}
 		}
 
