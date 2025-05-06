@@ -88,7 +88,7 @@ public:
 	Buffer	m_indexBuffer;
 
 	void Cleanup( DeviceContext & deviceContext );
-
+	void ResetDebugBuffers(DeviceContext* device);
 	void DrawIndexed( VkCommandBuffer vkCommandBUffer );
 };
 
