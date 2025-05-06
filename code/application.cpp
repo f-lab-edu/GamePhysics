@@ -439,8 +439,10 @@ void Application::Keyboard( int key, int scancode, int action, int modifiers ) {
 	}
 
 	if (GLFW_KEY_V == key && GLFW_RELEASE == action) {
-		for (auto& model : m_renderModels) {
-			model.isDebug = !model.isDebug; // Toggle debug flag
+		m_isDebug = !m_isDebug; // Toggle debug flag
+
+		for (auto& currentRenderModel : m_renderModels) {
+			currentRenderModel.model->ResetDebugBuffers(&m_deviceContext);
 		}
 	}
 }
@@ -664,7 +666,7 @@ void Application::DrawFrame() {
 	const uint32_t imageIndex = m_deviceContext.BeginFrame();
 
 	// Draw everything in an offscreen buffer
-	DrawOffscreen( &m_deviceContext, imageIndex, &m_uniformBuffer, m_renderModels.data(), (int)m_renderModels.size() );
+	DrawOffscreen( &m_deviceContext, imageIndex, &m_uniformBuffer, m_renderModels.data(), (int)m_renderModels.size(), m_isDebug );
 
 	//
 	//	Draw the offscreen framebuffer to the swap chain frame buffer
