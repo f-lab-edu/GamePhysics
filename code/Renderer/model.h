@@ -103,6 +103,8 @@ struct RenderModel {
 	uint32_t uboByteOffset;	// The byte offset into the uniform buffer
 	uint32_t uboByteSize;	// how much space we consume in the uniform buffer
 
+	bool isDebug;			// The flag to enable visual debugger
+
 	Vec3 pos;
 	Quat orient;
 };
