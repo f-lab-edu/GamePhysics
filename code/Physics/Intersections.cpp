@@ -18,7 +18,7 @@ bool RaySphere(const Vec3& rayStart, const Vec3& rayDirection, const Vec3& spher
 	// The standard derivation suggests b should be -1.0f * rayDirection.Dot(vectorRayOriginToSphereCenter) for the quadratic form a*t^2 + 2b*t + c = 0.
 	// However, this code uses b = rayDirection.Dot(vectorRayOriginToSphereCenter) (positive) and adjusts the solution formula accordingly.
 	// This avoids the negation operation.
-	const float b = rayDirection.Dot(vectorRayOriginToSphereCenter);
+	const float b = vectorRayOriginToSphereCenter.Dot(rayDirection);
 	const float c = vectorRayOriginToSphereCenter.Dot(vectorRayOriginToSphereCenter) - sphereRadius * sphereRadius;
 
 	// because b^2 is equal to (-b)^2, the operation below makes sense
@@ -35,7 +35,7 @@ bool RaySphere(const Vec3& rayStart, const Vec3& rayDirection, const Vec3& spher
 	return true;
 }
 bool SphereSphereDynamic(const ShapeSphere* shapeA, const ShapeSphere* shapeB, const Vec3& posA, const Vec3& posB, const Vec3& velA, const Vec3& velB,
-	const float deltaTime, Vec3& pointOnA, Vec3& pointOnB, float timeOfImpact) {
+	const float deltaTime, Vec3& pointOnA, Vec3& pointOnB, float& timeOfImpact) {
 	const Vec3 relativeVelocity = velA - velB;
 
 	const Vec3 startPointA = posA;
@@ -128,8 +128,8 @@ bool Intersect( Body * bodyA, Body * bodyB, const float deltaTime, contact_t & c
 	contact.bodyB = bodyB;
 
 	if (bodyA->m_shape->GetType() == Shape::SHAPE_SPHERE && bodyB->m_shape->GetType() == Shape::SHAPE_SPHERE) {
-		const ShapeSphere* sphereA = (const ShapeSphere*)bodyA->m_shape;
-		const ShapeSphere* sphereB = (const ShapeSphere*)bodyB->m_shape;
+		const ShapeSphere* sphereA = reinterpret_cast<const ShapeSphere*>(bodyA->m_shape);
+		const ShapeSphere* sphereB = reinterpret_cast<const ShapeSphere*>(bodyB->m_shape);
 
 		Vec3 posA = bodyA->m_position;
 		Vec3 posB = bodyB->m_position;
